@@ -43,6 +43,8 @@ $(document).ready(function () {
     };
 
     legend.addTo(map);
+
+    L.control.scale().addTo(map);
     
     var baseLayers = {
         "Traffic Incidents": trafficIncidents,
