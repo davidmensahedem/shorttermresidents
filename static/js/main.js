@@ -27,8 +27,23 @@ $(document).ready(function () {
         id: 'ericakuamoah06/clutbwa9n001d01piby2zdq9n', // Replace with your own Mapbox style ID
         accessToken: 'pk.eyJ1IjoiZXJpY2FrdWFtb2FoMDYiLCJhIjoiY2x0Ym9xaGEyMXY1ZzJrcGR5aDZhdjJ3cyJ9.JAiPKmIviFoezy5HMfLgYA'
     }).addTo(map);
-    
 
+    // Add a marker for short term rentals
+  
+    
+    // Leaflet Legend
+    var legend = L.control({ position: 'bottomleft' });
+
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = '<h5>Legend</h5>' +
+            '<i style="background: #ff0000"></i> Traffic Incidents<br>' +
+            '<i style="background: #0000ff"></i> Short Term Rentals';
+        return div;
+    };
+
+    legend.addTo(map);
+    
     var baseLayers = {
         "Traffic Incidents": trafficIncidents,
         "Short Term Rentals": shortTermRentals,
