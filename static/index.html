@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
+    <link rel="stylesheet" href="static/css/main.css">
+</head>
+
+<body>
+    <!-- Side Nav -->
+    <div id="sidebar">
+        <div class="sideBarContent">
+            <div class="sideBarHeader" id="sideBarHeader">
+                <h5 id="sideBarHeaderTitle">Short Term Residents Map</h5>
+            </div>
+           
+            <div id="sideBarFooter">
+                <div class="sideBarFooterContainer">
+                    <div class="sideBarFooterShareLoc">
+                        <small><button class="" id="shareLocBtn" onclick="getUserLocation()">Share Your Location</button></small>
+                        <br/>
+                        <small id="showShareLocCordinates"></small>
+                    </div>
+                   <small>David Mensah</small>
+                   <small id="currentDate"></small>
+                   <small><a href="#">Logout</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <div id="map"></div>
+    </div>
+
+    <!-- Leaflet.js Map -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-csv-geojson/dist/leaflet-csv-geojson.min.js"></script>
+    <script src="https://unpkg.com/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="static/PapaParse-5.0.2/papaparse.min.js"></script>
+    <script src="static/js/main.js"></script>
+</body>
+
+</html>
