@@ -17,17 +17,38 @@
             <div class="sideBarHeader" id="sideBarHeader">
                 <h5 id="sideBarHeaderTitle">Short Term Residents Map</h5>
             </div>
-           
+
+            <div id="mapfunctions">
+                <div class="sideBarSearch">
+                    <input type="text" id="searchInput" placeholder="Search for location">
+                    <button id="searchBtn" onclick="searchLocation()">Search</button>
+                </div>
+                <div class="sideBarFilter">
+                    <select id="filterSelect" onchange="">
+                        <option value="all">All</option>
+                        <option value="residents">Residents</option>
+                        <option value="non-residents">Non-Residents</option>
+                    </select>
+                </div>
+                <div class="sideBarAddLocation">
+                    <button id="addLocationBtn" onclick="">Add Location</button>
+                </div>
+                <br />
+                <button id="viewAllLayersId">View all layers</button>
+                <button id="getNearestShortTermRentalsBtn">Nearest Short Term Rentals</button>
+            </div>
+
             <div id="sideBarFooter">
                 <div class="sideBarFooterContainer">
                     <div class="sideBarFooterShareLoc">
-                        <small><button class="" id="shareLocBtn" onclick="getUserLocation()">Share Your Location</button></small>
-                        <br/>
+                        <small><button class="" id="shareLocBtn">Share Your
+                                Location</button></small>
+                        <br />
                         <small id="showShareLocCordinates"></small>
                     </div>
-                   <small>David Mensah</small>
-                   <small id="currentDate"></small>
-                   <small><a href="#">Logout</a></small>
+                    <small>David Mensah</small>
+                    <small id="currentDate"></small>
+                    <small><a href="#">Logout</a></small>
                 </div>
             </div>
         </div>
@@ -43,6 +64,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-csv-geojson/dist/leaflet-csv-geojson.min.js"></script>
     <script src="https://unpkg.com/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="static/js/main.js"></script>
 </body>
