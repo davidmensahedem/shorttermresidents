@@ -122,29 +122,35 @@ def profile():
     
     if request.method == "POST":
         
-        registerUsername = request.form.get("username")
-        registerEmail = request.form.get("email")
-        registerPassword = request.form.get("password")
-        userid = str(uuid.uuid4())
+        profileUpdateUsername = request.form.get("username")
+        userid = session.get("user_id")
+        profileUpdatePassword = request.form.get("password")
 
-        userquery = text("SELECT * FROM users WHERE username = :username")
-        emailquery = text("SELECT * FROM users WHERE email = :email")
+        userquery = text("SELECT * FROM users WHERE id = :id")
         
-        userExists = db.execute(userquery, {"username": registerUsername}).fetchone() 
-        emailExists = db.execute(emailquery, {"email": registerEmail}).fetchone() 
+        userExists = db.execute(userquery, {"id":userid}).fetchone()
         
-        if not userExists and not emailExists:
+        if userExists:
             
-            db.execute(text("INSERT INTO users (id,email,username, password) VALUES (:id,:email,:username, :password)"), {"id":userid,"email":registerEmail,"username":registerUsername, "password":registerPassword})
+            if userExists[2] == profileUpdateUsername:
+                profileUpdateUsername = userExists[2]
+            else:
+                profileUpdateUsername = profileUpdateUsername
+            
+            if profileUpdatePassword is not None and profileUpdatePassword != "":
+                profileUpdatePassword = profileUpdatePassword
+            else:
+                profileUpdatePassword = userExists[3]
+                
+            db.execute(text("UPDATE users SET username = :username, password = :password WHERE id = :id"), {"username": profileUpdateUsername,"password":profileUpdatePassword, "id": userid})
             db.commit()
             
             session["user_id"] = userid
-            session["user_name"] = registerUsername
-            session["user_email"] = registerEmail
+            session["user_name"] = profileUpdateUsername
             
-            return redirect("index.html")
+            return redirect("/home")
         
-        return render_template("login.html", message="User with email or username already exists.")
+        return render_template("profile.html", message="User with username already exists.", user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))
         
     if request.method == "GET":
         return render_template("profile.html", user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))

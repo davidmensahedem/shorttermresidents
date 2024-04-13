@@ -16,16 +16,19 @@ $(document).ready(function () {
     let TrafficIncidentsCount = document.getElementById('TrafficIncidentsCount');
     let communityServiceCount = document.getElementById('communityServiceCount');
     let viewForLayers = document.getElementById('viewForLayers');
+    viewForLayers.style.display = "none";
 
     let showAllLayers = false;
 
     let userLat = 0;
     let userLon = 0;
-    let maximumRentalsNumber = 5;
+    let maximumRentalsNumber = 0;
 
     var trafficDataCount = 0;
     var communityServiceDataCount = 0;
     var shortTermDataCount = 0;
+
+    numberOfLocations.value = 1;
 
     document.getElementById("currentDate").innerHTML = (new Date()).toDateString();
 
@@ -33,28 +36,28 @@ $(document).ready(function () {
     viewAllLayersId?.addEventListener('click', ToggleMapLayers);
 
     // add a change event 
-    numberOfLocations.addEventListener('change', function (e) {
-       // clear target value and reset
-        maximumRentalsNumber = e.target.value;
-        console.log("vALUE",maximumRentalsNumber);
-
-    });
 
     getNearestShortTermRentalsBtn.addEventListener('click', function (e) {
         e.preventDefault();
 
+        maximumRentalsNumber = parseInt(numberOfLocations.value);
+
         // get number of locations value
-        if (maximumRentalsNumber <= 0 && maximumRentalsNumber > 100) {
+        if (maximumRentalsNumber <= 0) {
             alert("Please enter a valid number from 1 to 100");
-            return;
         }
+
+        if (maximumRentalsNumber > 100) {
+            alert("Please enter a valid number less 1 to 100");
+        }
+
 
         if (userLat == 0 && userLon == 0)
             alert("Please share your location first");
         else
             getNearestShortTermRentals();
 
-        // reset form        
+
     });
 
     shareLocBtn.addEventListener('click', getUserLocation);
@@ -123,8 +126,7 @@ $(document).ready(function () {
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Community Service:</strong> " + feature.properties.name + "<br>" +
                 "<strong>Address:</strong> " + feature.properties.address + "<br>" +
-                "<strong>Phone:</strong> " + feature.properties.phone + "<br>" +
-                "<strong>Website:</strong> <a href='" + feature.properties.website + "' target='_blank'>" + feature.properties.website + "</a>";
+                "<strong>Comm Code:</strong> " + feature.properties.comm_code + "<br>";
             layer.bindPopup(popupContent);
         }
     })
@@ -143,9 +145,9 @@ $(document).ready(function () {
         },
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Incident:</strong> " + feature.properties.incident_info + "<br>" +
-                "<strong>Location:</strong> " + feature.properties.location + "<br>" +
-                "<strong>Details:</strong> " + feature.properties.details + "<br>" +
-                "<strong>Reported:</strong> " + feature.properties.reported_at;
+                "<strong>Incident Date:</strong> " + feature.properties.start_dt + "<br>" +
+                "<strong>Details:</strong> " + feature.properties.description + "<br>" +
+                "<strong>Count:</strong> " + feature.properties.count;
             layer.bindPopup(popupContent);
         }
     })
@@ -164,11 +166,10 @@ $(document).ready(function () {
         },
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Address:</strong> " + feature.properties.address + "<br>" +
-                "<strong>Neighbourhood:</strong> " + feature.properties.neighbourhood + "<br>" +
-                "<strong>License Number:</strong> " + feature.properties.license_number + "<br>" +
-                "<strong>License Type:</strong> " + feature.properties.license_type + "<br>" +
-                "<strong>License Status:</strong> " + feature.properties.license_status + "<br>" +
-                "<strong>License Expiry:</strong> " + feature.properties.license_expiry;
+                "<strong>License Number:</strong> " + feature.properties.business_licence_number + "<br>" +
+                "<strong>License Type:</strong> " + feature.properties.type_of_residence + "<br>" +
+                "<strong>License Status:</strong> " + feature.properties.status_description + "<br>" +
+                "<strong>License Expiry:</strong> " + feature.properties.licenced_expiry_date;
             layer.bindPopup(popupContent);
         }
     })
@@ -246,7 +247,7 @@ $(document).ready(function () {
             shortTermRentals.addTo(map);
             viewForLayers.style.display = "block";
             showAllLayers = false;
-        }else{
+        } else {
             map.removeLayer(communityService);
             map.removeLayer(trafficIncidents);
             map.removeLayer(shortTermRentals);
@@ -260,27 +261,36 @@ $(document).ready(function () {
     }
 
     function getNearestShortTermRentals() {
+
+
+        // remove existing markers
+        map.eachLayer(function (layer) {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        //add calgary marker
+        L.marker([51.0447, -114.0719]).addTo(map).bindPopup('Calgary').openPopup();
+
+
         fetch('https://data.calgary.ca/resource/gzkz-5k9a.geojson')
             .then(response => response.json())
             .then(rentals => {
-                console.log(rentals);
                 // 2. Retrieve User's Live Location (Assuming userLocation is an array [lat, lon])
                 var userLocation = [userLat, userLon]; // Get user's location
-                console.log(rentals)
                 // 3. Calculate Distances and Find Nearest Rentals
                 rentals.features
-                    .filter(feature => feature?.properties?.status_description.toLocaleLowerCase() == "licensed".toLocaleLowerCase())
+                    .filter(feature => feature?.properties?.status_description.toLocaleLowerCase() == "Licensed")
                     .forEach(feature => {
                         var rentalLocation = [feature?.geometry?.coordinates[0], feature?.geometry?.coordinates[1]]; // Get rental property location
-                        console.log(rentalLocation);
-                        console.log(userLocation);
                         var distance = calculateDistance(userLocation, rentalLocation);
                         feature.properties.distance = distance; // Store distance in properties
                     });
 
                 rentals.features.sort((a, b) => a.properties.distance - b.properties.distance); // Sort by distance
 
-                var nearestRentals = rentals.features.slice(0, maximumRentalsNumber); // Get top 5 nearest rentals
+                var nearestRentals = rentals.features.slice(0, maximumRentalsNumber); // Get nearest rentals
 
                 // 4. Display Results on Leaflet Map
                 nearestRentals.forEach(rental => {
@@ -295,6 +305,8 @@ $(document).ready(function () {
                         .addTo(map)
                         .bindPopup(rental?.properties?.status_description); // Display rental name in popup
                 });
+
+                maximumRentalsNumber = 0;
             })
             .catch(error => console.error('Error fetching data:', error));
     }

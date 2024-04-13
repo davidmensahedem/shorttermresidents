@@ -20,23 +20,13 @@
             </div>
 
             <div id="mapfunctions">
-                <div class="sideBarSearch">
-                    <input type="text" id="searchInput" placeholder="Search for location">
-                    <button id="searchBtn" onclick="searchLocation()">Search</button>
-                </div>
-                <div class="sideBarFilter">
-                    <select id="filterSelect" onchange="">
-                        <option value="all">All</option>
-                        <option value="residents">Residents</option>
-                        <option value="non-residents">Non-Residents</option>
-                    </select>
-                </div>
+
                 <div class="sideBarAddLocation">
                     <form id="nearestShortTermForm" class="needs-validation">
                         <div class="form-group">
                             <label for="numberOfLocations">Enter number of short term rentals</label>
-                            <input class="form-control" type="number" id="numberOfLocations" maxlength="4" required
-                                min="0" max="100">
+                            <input class="form-control" type="number" name="numberOfLocations" id="numberOfLocations"
+                                maxlength="4" required min="1" max="100">
                         </div>
                         <div class="form-group">
                             <button id="getNearestShortTermRentalsBtn">Nearest Short Term Rentals</button>
@@ -49,7 +39,10 @@
             <div id="sideBarFooter">
                 <div class="sideBarFooterContainer">
                     <div class="sideBarFooterShareLoc">
-
+                        <small><button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#chartModal">
+                               Show Community Crime Statistics
+                            </button></small>
                         <hr>
                         <small><button id="viewAllLayersId">Toggle Map Layers</button></small>
                         <small>
@@ -105,6 +98,26 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-labelledby="chartModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chartModalLabel">Bar Chart</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="crimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <!-- Leaflet.js Map -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -113,7 +126,13 @@
     <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"
+        integrity="sha512-WMEKGZ7L5LWgaPeJtw9MBM4i5w5OSBlSjTjCtSnvFJGSVD26gE5+Td12qN5pvWXhuWaWcVwF++F7aqu9cvqP0A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chartjs.js') }}"></script>
 
 </body>
 
