@@ -102,7 +102,11 @@ def home():
     if request.method == "GET":
         return render_template("index.html", user_name=session.get("user_name"))
 
-
+# Logout Page
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/login")
 
 
 
