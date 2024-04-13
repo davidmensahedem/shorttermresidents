@@ -83,3 +83,20 @@ footer {
     background-color: #f3f3f3;
     padding: 30px;
 }
+
+
+#signup-header div{
+    background-color: black;
+    color: white;
+    padding:20px;
+}
+
+
+#signup-header{
+    margin-bottom: 100px;
+}
+
+#signupForm{
+    background-color: #f3f3f3;
+    padding: 30px;
+}

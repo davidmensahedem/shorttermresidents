@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Website</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/main.css') }}">
 </head>
 
 <body>
-    <header id="login-header">
+    <header id="signup-header">
         <div class="">
             <h1 class="display-5 text-center">Get Nearest Short Term Rentals</h1>
         </div>
@@ -20,17 +20,17 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <form id="loginForm">
+                    <form id="signupForm" action="" method="post" class="needs-validation">
                         <div class="form-group">
                             <label for="username">Username</label>
-                            <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                            <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username" required>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
                         </div>
                         <div class="form-group">
-                            <p>Already have an account? <a href="#">Login here</a></p>
+                            <p>Already have an account? <a href="/login">Login here</a></p>
                         </div>
                         <button type="submit" class="btn btn-primary">Sign Up</button>
                     </form>
@@ -48,8 +48,8 @@
 
     <!-- Leaflet.js Map -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="static/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js" integrity="sha512-WMEKGZ7L5LWgaPeJtw9MBM4i5w5OSBlSjTjCtSnvFJGSVD26gE5+Td12qN5pvWXhuWaWcVwF++F7aqu9cvqP0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 
 </html>
