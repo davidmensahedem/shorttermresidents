@@ -35,7 +35,8 @@
                     <form id="nearestShortTermForm" class="needs-validation">
                         <div class="form-group">
                             <label for="numberOfLocations">Enter number of short term rentals</label>
-                            <input class="form-control" type="number" id="numberOfLocations" maxlength="4" required min="0" max="100">
+                            <input class="form-control" type="number" id="numberOfLocations" maxlength="4" required
+                                min="0" max="100">
                         </div>
                         <div class="form-group">
                             <button id="getNearestShortTermRentalsBtn">Nearest Short Term Rentals</button>
@@ -48,20 +49,36 @@
             <div id="sideBarFooter">
                 <div class="sideBarFooterContainer">
                     <div class="sideBarFooterShareLoc">
-                        
+
                         <hr>
                         <small><button id="viewAllLayersId">Toggle Map Layers</button></small>
                         <small>
-                            <ul>
-                               <li><small class="badge badge-danger" id="TrafficIncidentsCount"></small></li>
-                                <li><small class="badge badge-teal" id="communityServiceCount"></small></li>
-                                <li><small class="badge badge-purple" id="shortTermRentalCount"></small></li>
+                            <ul id="viewForLayers">
+                                <li><small class="badge badge-danger" id="TrafficIncidentsCount">
+                                        <div class="spinner-grow" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </small></li>
+                                <li><small class="badge badge-teal" id="communityServiceCount">
+                                        <div class="spinner-grow" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </small></li>
+                                <li><small class="badge badge-purple" id="shortTermRentalCount">
+                                        <div class="spinner-grow" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </small></li>
                             </ul>
                         </small>
                         <small><button class="" id="shareLocBtn">Share Your
                                 Location</button></small>
                         <br />
-                        <small id="showShareLocCordinates"></small>
+                        <small id="showShareLocCordinates">
+                            <div class="spinner-grow" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </small>
                     </div>
                     <small>
                         <a href="/profile">
@@ -84,7 +101,8 @@
 
     <!-- Main Content -->
     <div class="main-content" id="main-content">
-        <div id="map"></div>
+        <div id="map">
+        </div>
     </div>
 
     <!-- Leaflet.js Map -->

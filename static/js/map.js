@@ -15,6 +15,7 @@ $(document).ready(function () {
     let shortTermRentalCount = document.getElementById('shortTermRentalCount');
     let TrafficIncidentsCount = document.getElementById('TrafficIncidentsCount');
     let communityServiceCount = document.getElementById('communityServiceCount');
+    let viewForLayers = document.getElementById('viewForLayers');
 
     let showAllLayers = false;
 
@@ -243,7 +244,7 @@ $(document).ready(function () {
             communityService.addTo(map);
             trafficIncidents.addTo(map);
             shortTermRentals.addTo(map);
-
+            viewForLayers.style.display = "block";
             showAllLayers = false;
         }else{
             map.removeLayer(communityService);
@@ -251,6 +252,7 @@ $(document).ready(function () {
             map.removeLayer(shortTermRentals);
 
             showAllLayers = true;
+            viewForLayers.style.display = "none";
         }
 
         // Add the tile layer
