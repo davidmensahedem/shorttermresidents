@@ -15,7 +15,7 @@ $(document).ready(function () {
     let userLon = 0;
     let maximumRentalsNumber = 10
 
-    document.getElementById("currentDate").innerHTML = currentDate;
+    document.getElementById("currentDate").innerHTML = (new Date()).toDateString();
 
     viewAllLayersId.addEventListener('click', viewAllLayers);
 

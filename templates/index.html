@@ -47,7 +47,11 @@
                         <br />
                         <small id="showShareLocCordinates"></small>
                     </div>
-                    <small>David Mensah</small>
+                    <small>
+                        {% if user_name %}
+                        {{user_name}}
+                        {% endif %}
+                    </small>
                     <small id="currentDate"></small>
                     <small><a href="/logout">Logout</a></small>
                 </div>

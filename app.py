@@ -41,24 +41,26 @@ def login():
     try:
                 
         if session.get("user_id"):
-            return redirect("/home")
+            return render_template("index.html", user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))  
         
         if request.method == "POST":
-            loginUsername = request.form.get("username")
+            loginEmail = request.form.get("email")
             loginPassword = request.form.get("password")
         
-            result = db.execute(text("SELECT * FROM users WHERE username = :username AND password=:password"), {"username":loginUsername, "password":loginPassword}).fetchone()
+            result = db.execute(text("SELECT * FROM users WHERE email = :email AND password=:password"), {"email":loginEmail, "password":loginPassword}).fetchone()
             
             if result is None:
-                return render_template("login.html", message="Invalid username or password.")
+                return render_template("login.html", message="Invalid email or password.")
             
             session["user_id"] = result[0]
-            session["user_name"] = result[1]
+            session["user_email"] = result[1]
+            session["user_name"] = result[2]
 
             return redirect("/")
     
         if request.method == "GET":
             return render_template("login.html")
+        
     except SQLAlchemyError as e:
         print(str(e))
   
@@ -67,27 +69,35 @@ def login():
 # Register Page
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    session.clear()
+    
+    if session.get("user_id"):
+        return redirect("/login")
+    
     if request.method == "POST":
         
         registerUsername = request.form.get("username")
+        registerEmail = request.form.get("email")
         registerPassword = request.form.get("password")
         userid = str(uuid.uuid4())
 
+        userquery = text("SELECT * FROM users WHERE username = :username")
+        emailquery = text("SELECT * FROM users WHERE email = :email")
         
-        query = text("SELECT * FROM users WHERE username = :username")
-        userExists = db.execute(query, {"username": registerUsername}).fetchone()
+        userExists = db.execute(userquery, {"username": registerUsername}).fetchone() 
+        emailExists = db.execute(emailquery, {"email": registerEmail}).fetchone() 
         
-        if not userExists:
-            db.execute(text("INSERT INTO users (id,username, password) VALUES (:id,:username, :password)"), {"id":userid,"username":registerUsername, "password":registerPassword})
+        if not userExists and not emailExists:
+            
+            db.execute(text("INSERT INTO users (id,email,username, password) VALUES (:id,:email,:username, :password)"), {"id":userid,"email":registerEmail,"username":registerUsername, "password":registerPassword})
             db.commit()
             
             session["user_id"] = userid
             session["user_name"] = registerUsername
+            session["user_email"] = registerEmail
             
-            return redirect("index.html", message="Account created successfully.")
+            return redirect("index.html")
         
-        return render_template("login.html", message="User already exists.")
+        return render_template("login.html", message="User with email or username already exists.")
         
     if request.method == "GET":
         return render_template("signup.html")
