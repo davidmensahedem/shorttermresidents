@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <header id="login-header">
+    <header id="signup-header">
         <div class="">
             <h1 class="display-5 text-center">Get Nearest Short Term Rentals</h1>
         </div>
@@ -20,19 +20,23 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <form id="loginForm" action="{{ url_for('login')}}" method="post" class="needs-validation">
+                    <form id="profileForm" action="{{ url_for('profile')}}" method="post" class="needs-validation">
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                            <label for="username">Email</label>
+                            <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username" value="{{ user_email }}" disabled>
                         </div>
+
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username" value="{{ user_name }}" required>
+                        </div>
+
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
                         </div>
-                        <div class="form-group">
-                            <p>I do not have an account <a href="/register">Create Account</a></p>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
                     </form>
                 </div>
             </div>
@@ -49,7 +53,6 @@
     <!-- Leaflet.js Map -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js" integrity="sha512-WMEKGZ7L5LWgaPeJtw9MBM4i5w5OSBlSjTjCtSnvFJGSVD26gE5+Td12qN5pvWXhuWaWcVwF++F7aqu9cvqP0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 

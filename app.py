@@ -112,6 +112,47 @@ def home():
     if request.method == "GET":
         return render_template("index.html", user_name=session.get("user_name"))
 
+
+# Profile Page
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    
+    if session.get("user_id") is None:
+        return redirect("/login")
+    
+    if request.method == "POST":
+        
+        registerUsername = request.form.get("username")
+        registerEmail = request.form.get("email")
+        registerPassword = request.form.get("password")
+        userid = str(uuid.uuid4())
+
+        userquery = text("SELECT * FROM users WHERE username = :username")
+        emailquery = text("SELECT * FROM users WHERE email = :email")
+        
+        userExists = db.execute(userquery, {"username": registerUsername}).fetchone() 
+        emailExists = db.execute(emailquery, {"email": registerEmail}).fetchone() 
+        
+        if not userExists and not emailExists:
+            
+            db.execute(text("INSERT INTO users (id,email,username, password) VALUES (:id,:email,:username, :password)"), {"id":userid,"email":registerEmail,"username":registerUsername, "password":registerPassword})
+            db.commit()
+            
+            session["user_id"] = userid
+            session["user_name"] = registerUsername
+            session["user_email"] = registerEmail
+            
+            return redirect("index.html")
+        
+        return render_template("login.html", message="User with email or username already exists.")
+        
+    if request.method == "GET":
+        return render_template("profile.html", user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))
+
+
+
+
+
 # Logout Page
 @app.route("/logout")
 def logout():

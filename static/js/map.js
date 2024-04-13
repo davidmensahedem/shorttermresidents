@@ -10,20 +10,50 @@ $(document).ready(function () {
     let shareLocBtn = document.getElementById('shareLocBtn');
     let viewAllLayersId = document.getElementById('viewAllLayersId');
     let getNearestShortTermRentalsBtn = document.getElementById('getNearestShortTermRentalsBtn');
+    let numberOfLocations = document.getElementById('numberOfLocations');
+    let nearestShortTermForm = document.getElementById('nearestShortTermForm');
+    let shortTermRentalCount = document.getElementById('shortTermRentalCount');
+    let TrafficIncidentsCount = document.getElementById('TrafficIncidentsCount');
+    let communityServiceCount = document.getElementById('communityServiceCount');
+
+    let showAllLayers = false;
 
     let userLat = 0;
     let userLon = 0;
-    let maximumRentalsNumber = 10
+    let maximumRentalsNumber = 5;
+
+    var trafficDataCount = 0;
+    var communityServiceDataCount = 0;
+    var shortTermDataCount = 0;
 
     document.getElementById("currentDate").innerHTML = (new Date()).toDateString();
 
-    viewAllLayersId.addEventListener('click', viewAllLayers);
 
-    getNearestShortTermRentalsBtn.addEventListener('click', function () {
+    viewAllLayersId?.addEventListener('click', ToggleMapLayers);
+
+    // add a change event 
+    numberOfLocations.addEventListener('change', function (e) {
+       // clear target value and reset
+        maximumRentalsNumber = e.target.value;
+        console.log("vALUE",maximumRentalsNumber);
+
+    });
+
+    getNearestShortTermRentalsBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // get number of locations value
+        if (maximumRentalsNumber <= 0 && maximumRentalsNumber > 100) {
+            alert("Please enter a valid number from 1 to 100");
+            return;
+        }
+
         if (userLat == 0 && userLon == 0)
             alert("Please share your location first");
         else
             getNearestShortTermRentals();
+
+        // reset form        
     });
 
     shareLocBtn.addEventListener('click', getUserLocation);
@@ -44,19 +74,30 @@ $(document).ready(function () {
         .openPopup();
 
     // add a leaftjs scale to the map
-    L.control.scale().addTo(map);
+    L.control.scale({ position: 'bottomright' }).addTo(map);
 
     // Leaflet Legend
-    var legend = L.control({ position: 'bottomleft' });
+    var legend = L.control({ position: 'bottomright' });
 
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = '<h5>Legend</h5>' +
-            '<i style="background: #ff0000"></i> Traffic Incidents<br>' +
-            '<i style="background: #ff0000"></i> Community Service<br>' +
-            '<i style="background: #0000ff"></i> Short Term Rentals';
+        div.innerHTML = `<div class="mapLegend"><h5>Legend</h5>
+            <i style="background: #ff0000"></i> Traffic Incidents <small class="badge badge-danger">${trafficDataCount}</small><br>
+            <i style="background: #ff0000"></i> Community Service <small class="badge badge-teal">${communityServiceDataCount}</small><br> 
+            <i style="background: #0000ff"></i> Short Term Rentals <small class="badge badge-purple">${shortTermDataCount}</small></div>`;
         return div;
     };
+
+    // Add a blue bootstrap badge
+    var badge = L.control({ position: 'topright' });
+
+    badge.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'badge badge-primary p-2');
+        div.innerHTML = 'Project By: Eric Akuamoah and John Oyeniyi';
+        return div;
+    };
+
+    badge.addTo(map);
 
     legend.addTo(map);
     // end of add map legend
@@ -196,11 +237,24 @@ $(document).ready(function () {
     getUserLocation();
 
     // view all layers function
-    function viewAllLayers() {
+    function ToggleMapLayers() {
 
-        communityService.addTo(map);
-        trafficIncidents.addTo(map);
-        shortTermRentals.addTo(map);
+        if (showAllLayers) {
+            communityService.addTo(map);
+            trafficIncidents.addTo(map);
+            shortTermRentals.addTo(map);
+
+            showAllLayers = false;
+        }else{
+            map.removeLayer(communityService);
+            map.removeLayer(trafficIncidents);
+            map.removeLayer(shortTermRentals);
+
+            showAllLayers = true;
+        }
+
+        // Add the tile layer
+
     }
 
     function getNearestShortTermRentals() {
@@ -213,7 +267,7 @@ $(document).ready(function () {
                 console.log(rentals)
                 // 3. Calculate Distances and Find Nearest Rentals
                 rentals.features
-                    .filter(feature => feature?.properties?.status_description.toLocaleLowerCase() === "licensed".toLocaleLowerCase())
+                    .filter(feature => feature?.properties?.status_description.toLocaleLowerCase() == "licensed".toLocaleLowerCase())
                     .forEach(feature => {
                         var rentalLocation = [feature?.geometry?.coordinates[0], feature?.geometry?.coordinates[1]]; // Get rental property location
                         console.log(rentalLocation);
@@ -262,7 +316,29 @@ $(document).ready(function () {
     }
 
 
+    // get short term rentals feature total
+    fetch('https://data.calgary.ca/resource/gzkz-5k9a.geojson')
+        .then(response => response.json())
+        .then(rentals => {
+            shortTermRentalCount.innerHTML = `Total Short Term Rentals: ${rentals.features.length}`;
+        })
+        .catch(error => console.error('Error fetching data:', error));
 
+    // get community service feature total
+    fetch('https://data.calgary.ca/resource/x34e-bcjz.geojson')
+        .then(response => response.json())
+        .then(rentals => {
+            communityServiceCount.innerHTML = `Total Community Service: ${rentals.features.length}`;
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+    // get traffic incidents feature total
+    fetch('https://data.calgary.ca/resource/35ra-9556.geojson')
+        .then(response => response.json())
+        .then(rentals => {
+            TrafficIncidentsCount.innerHTML = `Total Traffic Incidents: ${rentals.features.length}`;
+        })
+        .catch(error => console.error('Error fetching data:', error));
 
 
 
