@@ -56,3 +56,30 @@
      align-items: center;
      gap: 5px;
  }
+
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: black;
+    color: white;
+    padding: 10px;
+}
+
+
+#login-header div{
+    background-color: black;
+    color: white;
+    padding:20px;
+}
+
+#login-header {
+    margin-bottom: 100px;
+}
+
+#loginForm{
+    background-color: #f3f3f3;
+    padding: 30px;
+}
