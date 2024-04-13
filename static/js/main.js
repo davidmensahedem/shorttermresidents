@@ -9,8 +9,8 @@ $(document).ready(function () {
     let shareLocBtn = document.getElementById('shareLocBtn');
     let viewAllLayersId = document.getElementById('viewAllLayersId');
     let getNearestShortTermRentalsBtn = document.getElementById('getNearestShortTermRentalsBtn');
-    let userLat = 51.0447;
-    let userLon = -114.0719;
+    let userLat = 0;
+    let userLon = 0;
     let maximumRentalsNumber = 10
 
     var currentDate = new Date().toTimeString();
