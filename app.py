@@ -41,7 +41,7 @@ def login():
     try:
                 
         if session.get("user_id"):
-            return render_template("index.html", user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))  
+            return render_template("index.html",message="",user_name=session.get("user_name"), user_email=session.get("user_email"), user_id=session.get("user_id"))  
         
         if request.method == "POST":
             loginEmail = request.form.get("email")
@@ -74,7 +74,6 @@ def register():
         return redirect("/login")
     
     if request.method == "POST":
-        
         registerUsername = request.form.get("username")
         registerEmail = request.form.get("email")
         registerPassword = request.form.get("password")
@@ -82,12 +81,11 @@ def register():
 
         userquery = text("SELECT * FROM users WHERE username = :username")
         emailquery = text("SELECT * FROM users WHERE email = :email")
-        
+    
         userExists = db.execute(userquery, {"username": registerUsername}).fetchone() 
         emailExists = db.execute(emailquery, {"email": registerEmail}).fetchone() 
-        
+    
         if not userExists and not emailExists:
-            
             db.execute(text("INSERT INTO users (id,email,username, password) VALUES (:id,:email,:username, :password)"), {"id":userid,"email":registerEmail,"username":registerUsername, "password":registerPassword})
             db.commit()
             
@@ -95,13 +93,11 @@ def register():
             session["user_name"] = registerUsername
             session["user_email"] = registerEmail
             
-            return redirect("index.html")
+            return redirect("/")
         
-        return render_template("login.html", message="User with email or username already exists.")
-        
+        return render_template("signup.html", message="User with username or email already exists.")
     if request.method == "GET":
         return render_template("signup.html")
-
 
 #Home Page
 @app.route("/home", methods=["GET", "POST"])
