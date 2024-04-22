@@ -31,6 +31,11 @@
      margin-bottom: 30px;
  }
 
+ .logo{
+        width: 200px;
+        height: 200px;
+ }
+
  #shareLocBtn,
  #viewAllLayersId {
      padding: 5px;
@@ -70,6 +75,19 @@
      gap: 5px;
  }
 
+.logo-container {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.logo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
 
  footer {
      position: fixed;
@@ -106,11 +124,10 @@
  }
 
  #login-header {
-     margin-bottom: 100px;
+     margin-bottom: 20px;
  }
 
  #loginForm {
-     background-color: #f3f3f3;
      padding: 30px;
  }
 
@@ -123,12 +140,11 @@
 
 
  #signup-header {
-     margin-bottom: 100px;
+     margin-bottom: 20px;
  }
 
  #signupForm {
-     background-color: #f3f3f3;
-     padding: 30px;
+     padding: 20px;
  }
 
  .mapLegend {
@@ -144,4 +160,9 @@
  .badge-purple {
      background-color: purple;
      color: white;
+ }
+
+ .badge-yellow{
+    background-color: yellow;
+    color: white;
  }

@@ -15,10 +15,14 @@ $(document).ready(function () {
     let shortTermRentalCount = document.getElementById('shortTermRentalCount');
     let TrafficIncidentsCount = document.getElementById('TrafficIncidentsCount');
     let communityServiceCount = document.getElementById('communityServiceCount');
+    let schoolCount = document.getElementById('schoolCount');
     let viewForLayers = document.getElementById('viewForLayers');
     viewForLayers.style.display = "none";
 
+
     let showAllLayers = false;
+
+    let isLocationShared = false;
 
     let userLat = 0;
     let userLon = 0;
@@ -27,6 +31,7 @@ $(document).ready(function () {
     var trafficDataCount = 0;
     var communityServiceDataCount = 0;
     var shortTermDataCount = 0;
+    var schoolDataCount = 0;
 
     numberOfLocations.value = 1;
 
@@ -71,24 +76,21 @@ $(document).ready(function () {
         maxZoom: 18,
     }).addTo(map);
 
-    // Add a marker for Calgary
-    L.marker([51.0447, -114.0719])
-        .addTo(map)
-        .bindPopup('Calgary')
-        .openPopup();
+
 
     // add a leaftjs scale to the map
-    L.control.scale({ position: 'bottomright' }).addTo(map);
+    L.control.scale({ position: 'bottomleft' }).addTo(map);
 
     // Leaflet Legend
-    var legend = L.control({ position: 'bottomright' });
+    var legend = L.control({ position: 'bottomleft' });
 
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML = `<div class="mapLegend"><h5>Legend</h5>
             <i style="background: #ff0000"></i> Traffic Incidents <small class="badge badge-danger">${trafficDataCount}</small><br>
             <i style="background: #ff0000"></i> Community Service <small class="badge badge-teal">${communityServiceDataCount}</small><br> 
-            <i style="background: #0000ff"></i> Short Term Rentals <small class="badge badge-purple">${shortTermDataCount}</small></div>`;
+            <i style="background: #0000ff"></i> Short Term Rentals <small class="badge badge-purple">${shortTermDataCount}</small><br>
+            <i style="background: #0000ff"></i> Schools Data <small class="badge badge-yellow">${schoolDataCount}</small></div>`;
         return div;
     };
 
@@ -107,14 +109,15 @@ $(document).ready(function () {
     // end of add map legend
 
 
-
     // Map Layers 
     // **********
     // **********
     // add a community service layer from a geojson api source
-    var communityService = L.geoJson.ajax("https://data.calgary.ca/resource/x34e-bcjz.geojson", {
+    var communityService = L.markerClusterGroup();
+
+    L.geoJson.ajax("https://data.calgary.ca/resource/x34e-bcjz.geojson", {
         pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
+            let marker = L.circleMarker(latlng, {
                 radius: 5,
                 fillColor: "teal",
                 color: "#000",
@@ -122,6 +125,10 @@ $(document).ready(function () {
                 opacity: 1,
                 fillOpacity: 0.8
             });
+
+            communityService.addLayer(marker);
+
+            return marker;
         },
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Community Service:</strong> " + feature.properties.name + "<br>" +
@@ -132,9 +139,11 @@ $(document).ready(function () {
     })
 
     // add a traffic incidents layer from a geojson api source
-    var trafficIncidents = L.geoJson.ajax("https://data.calgary.ca/resource/35ra-9556.geojson", {
+    var trafficIncidents = L.markerClusterGroup();
+
+    L.geoJson.ajax("https://data.calgary.ca/resource/35ra-9556.geojson", {
         pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
+            let marker = L.circleMarker(latlng, {
                 radius: 5,
                 fillColor: "red",
                 color: "#000",
@@ -142,6 +151,10 @@ $(document).ready(function () {
                 opacity: 1,
                 fillOpacity: 0.8
             });
+
+            trafficIncidents.addLayer(marker);
+
+            return marker;
         },
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Incident:</strong> " + feature.properties.incident_info + "<br>" +
@@ -152,10 +165,12 @@ $(document).ready(function () {
         }
     })
 
-    // add a short term rentals layer from a geojson api source
-    var shortTermRentals = L.geoJson.ajax("https://data.calgary.ca/resource/gzkz-5k9a.geojson", {
+    var shortTermRentals = L.markerClusterGroup();
+
+    // add a short term rentals layer 
+    L.geoJson.ajax("https://data.calgary.ca/resource/gzkz-5k9a.geojson", {
         pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, {
+            let marker = L.circleMarker(latlng, {
                 radius: 5,
                 fillColor: "purple",
                 color: "#000",
@@ -163,6 +178,10 @@ $(document).ready(function () {
                 opacity: 1,
                 fillOpacity: 0.8
             });
+
+            shortTermRentals.addLayer(marker)
+
+            return marker;
         },
         onEachFeature: function (feature, layer) {
             var popupContent = "<strong>Address:</strong> " + feature.properties.address + "<br>" +
@@ -174,7 +193,44 @@ $(document).ready(function () {
         }
     })
 
-    // create a heat map out of the traffic incidents layer pick your source from the geojson api
+    shortTermRentals.addTo(map);
+
+    // add the schools layer 
+    var schools = L.markerClusterGroup();
+
+    L.geoJson.ajax("https://data.calgary.ca/resource/fd9t-tdn2.geojson", {
+        pointToLayer: function (feature, latlng) {
+            let marker = L.circleMarker(latlng, {
+                radius: 5,
+                fillColor: "yellow",
+                color: "#000",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            });
+
+            schools.addLayer(marker);
+
+            return marker;
+        },
+        onEachFeature: function (feature, layer) {
+
+            var popupContent = "<strong>School:</strong> " + feature.properties.name + "<br>" +
+                "<strong>Address:</strong> " + feature.properties.address_ab + "<br>" +
+                "<strong>Grade:</strong> " + feature.properties.grades + "<br>" +
+                "<strong>City:</strong> " + feature.properties.city + "<br>";
+            layer.bindPopup(popupContent);
+        }
+    })
+
+    // Create the heat map layer
+    var heatMapLayer = L.heatLayer([], {
+        radius: 10,
+        blur: 5,
+        maxZoom: 13,
+    });
+
+    // Fetch the data and update the heat map layer
     fetch('https://data.calgary.ca/resource/35ra-9556.geojson')
         .then(response => response.json())
         .then(data => {
@@ -185,14 +241,8 @@ $(document).ready(function () {
                 10 // Intensity (you can customize this based on your data)
             ]);
 
-            // Create the heat map layer
-            var heatMapLayer = L.heatLayer(heatMapData, {
-                radius: 25,
-                blur: 15,
-                maxZoom: 17,
-                radius: 20,
-                gradient: { 0.4: 'red', 0.65: 'lime', 1: 'red' }
-            }).addTo(map);
+            // Update the heat map layer with new data
+            heatMapLayer.setLatLngs(heatMapData);
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -207,13 +257,12 @@ $(document).ready(function () {
     var baseLayers = {
         "Traffic Incidents": trafficIncidents,
         "Community Service": communityService,
-        "Short Term Rentals": shortTermRentals
+        "Short Term Rentals": shortTermRentals,
+        "Schools": schools,
+        "Traffic Heat Map": heatMapLayer
     };
 
     layercontrol = L.control.layers(baseLayers).addTo(map);
-
-
-
 
 
     // Function to get user's location coordinates
@@ -224,7 +273,19 @@ $(document).ready(function () {
                 userLon = position.coords.longitude;
                 var coordinates = "Latitude: " + userLat + ", Longitude: " + userLon;
                 document.getElementById("showShareLocCordinates").innerHTML = coordinates;
+
+                map.setView([userLat, userLon], 13); // Center the map to user's location
+
+                L.marker([position.coords.latitude, position.coords.longitude])
+                    .addTo(map)
+                    .bindPopup('You are here!')
+                    .openPopup();
             });
+
+            isLocationShared = true;
+
+            shareLocBtn.disabled = true;
+
         } else {
             document.getElementById("showShareLocCordinates").innerHTML = "Geolocation is not supported by this browser.";
         }
@@ -235,8 +296,6 @@ $(document).ready(function () {
         map.removeControl(layercontrol);
     }
 
-    // Call the function to get user's location
-    getUserLocation();
 
     // view all layers function
     function ToggleMapLayers() {
@@ -245,12 +304,14 @@ $(document).ready(function () {
             communityService.addTo(map);
             trafficIncidents.addTo(map);
             shortTermRentals.addTo(map);
+            schools.addTo(map);
             viewForLayers.style.display = "block";
             showAllLayers = false;
         } else {
             map.removeLayer(communityService);
             map.removeLayer(trafficIncidents);
             map.removeLayer(shortTermRentals);
+            map.removeLayer(schools);
 
             showAllLayers = true;
             viewForLayers.style.display = "none";
@@ -260,19 +321,13 @@ $(document).ready(function () {
 
     }
 
-    function getNearestShortTermRentals() {
-
-
-        // remove existing markers
+    function getNearestShortTermRentals(features) {
+        // Remove existing markers
         map.eachLayer(function (layer) {
             if (layer instanceof L.Marker) {
                 map.removeLayer(layer);
             }
         });
-
-        //add calgary marker
-        L.marker([51.0447, -114.0719]).addTo(map).bindPopup('Calgary').openPopup();
-
 
         fetch('https://data.calgary.ca/resource/gzkz-5k9a.geojson')
             .then(response => response.json())
@@ -280,20 +335,30 @@ $(document).ready(function () {
                 // 2. Retrieve User's Live Location (Assuming userLocation is an array [lat, lon])
                 var userLocation = [userLat, userLon]; // Get user's location
                 // 3. Calculate Distances and Find Nearest Rentals
-                rentals.features
-                    .filter(feature => feature?.properties?.status_description.toLocaleLowerCase() == "Licensed")
-                    .forEach(feature => {
-                        var rentalLocation = [feature?.geometry?.coordinates[0], feature?.geometry?.coordinates[1]]; // Get rental property location
-                        var distance = calculateDistance(userLocation, rentalLocation);
-                        feature.properties.distance = distance; // Store distance in properties
-                    });
 
-                rentals.features.sort((a, b) => a.properties.distance - b.properties.distance); // Sort by distance
+                rentals.features = rentals.features
+                    .filter(feature => feature?.properties?.status_description?.toLowerCase() === "licensed" && feature?.geometry?.coordinates); // Filter licensed rentals with non-null coordinates
 
-                var nearestRentals = rentals.features.slice(0, maximumRentalsNumber); // Get nearest rentals
+                rentals.features.forEach(rental => {
 
-                // 4. Display Results on Leaflet Map
-                nearestRentals.forEach(rental => {
+                    let featureCoordinates = rental.geometry.coordinates;
+
+                    let distance = turf.distance(turf.point([userLat, userLon]), turf.point([featureCoordinates[1], featureCoordinates[0]]), { units: 'kilometers' });
+
+                    rental.properties.distance = distance;
+                });
+
+                let nearestFeatures = rentals.features.sort((a, b) => a.properties.distance - b.properties.distance);
+
+                nearestFeatures = nearestFeatures.slice(0, maximumRentalsNumber);
+
+                nearestFeatures.forEach(rental => {
+
+                    let popupContent = "<strong>Address:</strong> " + rental.properties.address + "<br>" +
+                        "<strong>License Number:</strong> " + rental.properties.business_licence_number + "<br>" +
+                        "<strong>License Type:</strong> " + rental.properties.type_of_residence + "<br>" +
+                        "<strong>License Status:</strong> " + rental.properties.status_description + "<br>" +
+                        "<strong>License Expiry:</strong> " + rental.properties.licenced_expiry_date;
 
                     L.marker([rental.geometry.coordinates[1], rental.geometry.coordinates[0]], {
                         icon: L.icon({
@@ -303,32 +368,32 @@ $(document).ready(function () {
                         })
                     })
                         .addTo(map)
-                        .bindPopup(rental?.properties?.status_description); // Display rental name in popup
+                        .bindPopup(popupContent);
                 });
+
+                L.marker([userLat, userLon])
+                    .addTo(map)
+                    .bindPopup('You are here!')
+                    .openPopup();
 
                 maximumRentalsNumber = 0;
             })
             .catch(error => console.error('Error fetching data:', error));
     }
 
+
     // Function to calculate distance between two points (Haversine formula)
     function calculateDistance(point1, point2) {
-        const R = 6371; // Radius of the Earth in kilometers
         const [lat1, lon1] = point1;
         const [lat2, lon2] = point2;
 
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const latDiff = Math.abs(lat2 - lat1);
+        const lonDiff = Math.abs(lon2 - lon1);
 
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const distance = Math.sqrt(Math.pow(latDiff, 2) + Math.pow(lonDiff, 2));
 
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c; // Distance in kilometers
+        return distance;
     }
-
 
     // get short term rentals feature total
     fetch('https://data.calgary.ca/resource/gzkz-5k9a.geojson')
@@ -341,23 +406,23 @@ $(document).ready(function () {
     // get community service feature total
     fetch('https://data.calgary.ca/resource/x34e-bcjz.geojson')
         .then(response => response.json())
-        .then(rentals => {
-            communityServiceCount.innerHTML = `Total Community Service: ${rentals.features.length}`;
+        .then(coms => {
+            communityServiceCount.innerHTML = `Total Community Service: ${coms.features.length}`;
         })
         .catch(error => console.error('Error fetching data:', error));
 
     // get traffic incidents feature total
     fetch('https://data.calgary.ca/resource/35ra-9556.geojson')
         .then(response => response.json())
-        .then(rentals => {
-            TrafficIncidentsCount.innerHTML = `Total Traffic Incidents: ${rentals.features.length}`;
+        .then(traffics => {
+            TrafficIncidentsCount.innerHTML = `Total Traffic Incidents: ${traffics.features.length}`;
         })
         .catch(error => console.error('Error fetching data:', error));
 
-
-
-
-
-
-
+    fetch('https://data.calgary.ca/resource/fd9t-tdn2.geojson')
+        .then(response => response.json())
+        .then(schs => {
+            schoolCount.innerHTML = `Total Number of Schools: ${schs.features.length}`;
+        })
+        .catch(error => console.error('Error fetching data:', error));
 });
